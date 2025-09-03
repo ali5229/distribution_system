@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import Select from "react-select";
+import BackButton from "@/app/components/backButton/backButton";
+import Spinner from '@/app/components/Spinner/loadSpinner';
 
 export default function UpdateSubarea() {
   const [areas, setAreas] = useState([]);
@@ -71,7 +73,9 @@ export default function UpdateSubarea() {
 
   return (
     <main className="m-10 flex flex-col">
-      <p className="text-3xl font-bold">Update a Sub-area</p>
+       <div className='flex flex-row'>
+             <BackButton />
+            <p className="text-3xl font-bold">Update a Sub-Area</p></div>
       <div className="flex flex-col gap-6 p-8 bg-white mt-6 rounded-lg shadow-md">
         <div>
           <p>Area</p>
@@ -128,12 +132,12 @@ export default function UpdateSubarea() {
             Cancel
           </button>
           <button
-            className="p-3 ml-2 h-[50px] w-[180px] rounded-xl cursor-pointer hover:shadow-lg bg-[#5145E7] text-white"
+            className="p-3 ml-2 h-[50px] w-[180px] flex justify-center align-middle rounded-xl cursor-pointer hover:shadow-lg bg-[#5145E7] text-white"
             type="button"
             onClick={onSave}
             disabled={saving}
           >
-            {saving ? "Updating..." : "Update Subarea"}
+            {saving ? <Spinner /> : "Update Subarea"}
           </button>
         </div>
       </div>

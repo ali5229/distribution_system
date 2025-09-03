@@ -2,10 +2,11 @@ import { NextResponse } from "next/server";
 import {sql, withTransaction} from "@/lib/db";
 
 export async function POST(req){
-    const {areaName, subareaName } = await req.json();
+    const {areaName } = await req.json();
+    
     if(!areaName){
-        return NextResponse.json({error: "Missing areaName or subareaName"}, {status: 400});
-    }
+            return NextResponse.json({error: "Missing areaName"}, {status: 400});
+        }
 
     try{
         const result = await withTransaction(async (conn) =>{
@@ -14,18 +15,10 @@ export async function POST(req){
             );
 
             const areaId = areaRes.insertId;
-            let subareaId = null;
-            
-            if(subareaName && subareaName.trim()){
-                const [subRes] = await conn.execute(
-                    "INSERT INTO subareas (area_id, name) VALUES (?, ?)", [areaId, subareaName.trim()]
-                );
-                subareaId = subRes.insertId;
-            }
-            return {areaId, subareaId};
+            return {areaId};
         });
         return NextResponse.json({ok:true, ...result});
-    }catch(err){
+    } catch(err){
         return NextResponse.json({error: err.message}, {status: 500});
     }
 }
