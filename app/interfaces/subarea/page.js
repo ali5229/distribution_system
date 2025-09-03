@@ -143,15 +143,3 @@ export default function SubArea(){
   )
 }
 
- 
-
-{/* <select  className="h-[50px] border-2 border-solid border-[#F3F6F8] rounded-lg p-3 w-full"
-            value={selectedArea}
-            onChange={(e) => setSelectedArea(e.target.value)}>
-               <option value="">-- Select an Area --</option>
-              {areas.map((a) => (
-                <option key={a.area_id} value={a.area_id}>
-                  {a.area_name}
-              </option>
-            ))}
-            </select> */}
