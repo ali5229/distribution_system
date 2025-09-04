@@ -5,8 +5,8 @@ import Select from "react-select";
 import Image from "next/image";
 import AddBlue from '../../assets/area/add-blue.png'
 import Spinner from "@/app/components/Spinner/loadSpinner";
-
 import BackButton from "@/app/components/backButton/backButton";
+import LoadingIndicator from "@/app/components/loadingIndicator/loadingIndicator";
 
 export default function MaterialForm() {
 
@@ -27,15 +27,17 @@ export default function MaterialForm() {
   const [savingModal, setSavingModal] = useState(false);
   const [modalOpen, setModalOpen] = useState(null); 
   const [newOptionName, setNewOptionName] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
+  setLoading(true);
   const [prodRes, unitRes, typeRes, compRes] = await Promise.all([
     fetch("/api/materials"),
     fetch("/api/units"),
     fetch("/api/types"),
     fetch("/api/companies"),
   ]);
-
+  setLoading(false);
   if (prodRes.ok) {
     const { products, nextId } = await prodRes.json();
     setProducts(products);
@@ -73,6 +75,7 @@ export default function MaterialForm() {
             sale_price: Number(data.sPrice),
             type_id: data.type.value,
             company_id: data.company.value,
+            location: data.pLocation || null,
           };
 
           let res;
@@ -90,7 +93,6 @@ export default function MaterialForm() {
               body: JSON.stringify(payload),
             });
           }
-
           const json = await res.json();
           if (!res.ok) throw new Error(json.error || "Something went wrong");
 
@@ -109,6 +111,7 @@ export default function MaterialForm() {
             sPrice: "",
             type: null,
             company: null,
+            pLocation: "",
           });
         } catch (err) {
           console.error("Save failed:", err);
@@ -148,12 +151,13 @@ export default function MaterialForm() {
   }
 };
 
-
-
-
-  
   return (
-    <main className="m-10 flex flex-col">
+    <main className="relative m-10 flex flex-col">
+          {loading && <div className="fixed inset-0 backdrop-blur-xs z-50 flex items-center justify-center">
+              <div className="p-3 flex items-center justify-center h-[50px] text-white w-[100px] rounded-lg">
+                <LoadingIndicator />
+              </div>
+            </div>}
       <div className='flex flex-row mb-10'>
                       <BackButton />
                      <p className="text-3xl font-bold">Add New Material</p></div>
@@ -162,7 +166,6 @@ export default function MaterialForm() {
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col gap-6 p-8 bg-white rounded-lg shadow-md w-4/5"
       >
-       
         <div className="grid grid-cols-2 gap-4">
           <div>
               <p className="font-semibold">Product ID (auto)</p>
@@ -192,12 +195,11 @@ export default function MaterialForm() {
                     isSearchable
                     onChange={(opt) => {
                       field.onChange(opt);
-                      if (opt) {
-                        // fetch full product info
-                        fetch(`/api/materials/${opt.value}`)
+                      if (opt) {setLoading(true);
+                        fetch(`/api/materials/${opt.value}`)  
                           .then((res) => res.json())
                           .then((product) => {
-                            if (product) {
+                            if (product) { 
                              reset({
                                   previousProduct: opt,
                                   nameEng: product.product_name_eng,
@@ -225,13 +227,14 @@ export default function MaterialForm() {
                                         label: companies.find((c) => c.company_id === product.company_id).company_name,
                                       }
                                     : null,
+                                  pLocation: product.location || "",
                                 });
 
-                            }
+                            } setLoading(false);
                           });
 
                       } else {
-                        reset(); // clear if unselected
+                        reset(); 
                       }
                     }}
                   />
@@ -305,6 +308,7 @@ export default function MaterialForm() {
                   />
                 )}
               />
+
               <button
                 type="button"
                 onClick={() => setModalOpen("unit")}
@@ -447,6 +451,14 @@ export default function MaterialForm() {
           {errors.company && (
             <span className="text-red-500 text-sm">Required</span>
           )}
+        </div>
+        <div>
+          <p  className="font-semibold">Location</p>
+          <input
+            {...register("pLocation")}
+            className="h-[50px] border-2 border-[#F3F6F8] rounded-lg p-3 w-full"
+            placeholder="Enter location here"
+          />
         </div>
         <div className="flex justify-end">
           <button

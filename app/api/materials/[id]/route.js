@@ -16,7 +16,8 @@ export async function GET(req, { params }) {
         purchase_price,
         sale_price,
         type_id,
-        company_id
+        company_id,
+        location
        FROM materials
        WHERE product_id = ?`,
       [id]
@@ -48,6 +49,7 @@ export async function PUT(req, { params }) {
       sale_price,
       type_id,
       company_id,
+      location,
     } = body;
 
     const result = await sql(
@@ -62,6 +64,7 @@ export async function PUT(req, { params }) {
            sale_price = ?,
            type_id = ?,
            company_id = ?,
+           location = ?,
            updated_at = CURRENT_TIMESTAMP
        WHERE product_id = ?`,
       [
@@ -75,6 +78,7 @@ export async function PUT(req, { params }) {
         sale_price,
         type_id,
         company_id,
+        location || null,
         id,
       ]
     );

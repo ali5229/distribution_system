@@ -15,6 +15,7 @@ export async function POST(req) {
       sale_price,
       type_id,
       company_id,
+      location,
     } = body;
 
     if (!product_name_eng || !packing_no || !unit_id || !reorder_level || !sales_mc || !purchase_price || !sale_price || !type_id || !company_id) {
@@ -23,9 +24,9 @@ export async function POST(req) {
 
     const result = await sql(
       `INSERT INTO materials 
-      (product_name_eng, product_name_urd, packing_no, unit_id, reorder_level, sales_mc, purchase_price, sale_price, type_id, company_id) 
+      (product_name_eng, product_name_urd, packing_no, unit_id, reorder_level, sales_mc, purchase_price, sale_price, type_id, company_id, location) 
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [product_name_eng, product_name_urd || null, packing_no, unit_id, reorder_level, sales_mc, purchase_price, sale_price, type_id, company_id]
+      [product_name_eng, product_name_urd || null, packing_no, unit_id, reorder_level, sales_mc, purchase_price, sale_price, type_id, company_id, location || null]
     );
 
     return NextResponse.json({ id: result.insertId, ok: true });
@@ -56,34 +57,6 @@ export async function GET() {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
-
-
-// export async function GET(req, { params }) {
-//   try {
-//     const { id } = params;
-
-//     const result = await sql(`
-//       SELECT 
-//         m.*,
-//         u.unit_name,
-//         t.type_name,
-//         c.company_name
-//       FROM materials m
-//       JOIN units u ON m.unit_id = u.unit_id
-//       JOIN types t ON m.type_id = t.type_id
-//       JOIN companies c ON m.company_id = c.company_id
-//       WHERE m.product_id = ?
-//     `, [id]);
-
-//     if (!result.length) {
-//       return NextResponse.json({ error: "Not found" }, { status: 404 });
-//     }
-
-//     return NextResponse.json(result[0]);
-//   } catch (err) {
-//     return NextResponse.json({ error: err.message }, { status: 500 });
-//   }
-// }
 
 
 
