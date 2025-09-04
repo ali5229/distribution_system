@@ -4,9 +4,6 @@ import { useForm, Controller } from "react-hook-form";
 import Select from "react-select";
 import Image from "next/image";
 import AddBlue from '../../assets/area/add-blue.png'
-import UpdateBlue from '../../assets/area/update-blue.png'
-import AddOrange from '../../assets/area/add-orange.png'
-import UpdateOrange from '../../assets/area/update-orange.png'
 import Spinner from "@/app/components/Spinner/loadSpinner";
 
 import BackButton from "@/app/components/backButton/backButton";
@@ -16,9 +13,10 @@ export default function MaterialForm() {
   const {
     register,
     handleSubmit,
+    watch,
     control,
     reset,
-    formState: { errors },
+    formState: { errors,isSubmitting },
   } = useForm();
 
   const [products, setProducts] = useState([]);
@@ -27,8 +25,6 @@ export default function MaterialForm() {
   const [companies, setCompanies] = useState([]);
   const [nextProductId, setNextProductId] = useState(null);
   const [savingModal, setSavingModal] = useState(false);
-
-  
   const [modalOpen, setModalOpen] = useState(null); 
   const [newOptionName, setNewOptionName] = useState("");
 
@@ -41,8 +37,9 @@ export default function MaterialForm() {
   ]);
 
   if (prodRes.ok) {
-    const { data } = await prodRes.json();
-    setProducts(data);
+    const { products, nextId } = await prodRes.json();
+    setProducts(products);
+    setNextProductId(nextId);
   }
   if (unitRes.ok) {
     const { data } = await unitRes.json();
@@ -64,9 +61,61 @@ export default function MaterialForm() {
 }, []);
 
   const onSubmit = async (data) => {
-    console.log("Form data:", data);
-    // TODO: post to /api/products
-  };
+        try {
+          const payload = {
+            product_name_eng: data.nameEng,
+            product_name_urd: data.nameUrd || null,
+            packing_no: Number(data.packing),
+            unit_id: data.unit.value,
+            reorder_level: Number(data.reorder),
+            sales_mc: Number(data.saleMc),
+            purchase_price: Number(data.pPrice),
+            sale_price: Number(data.sPrice),
+            type_id: data.type.value,
+            company_id: data.company.value,
+          };
+
+          let res;
+          if (data.previousProduct) {
+             res = await fetch(`/api/materials/${data.previousProduct.value}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+
+          } else {
+            res = await fetch("/api/materials", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+          }
+
+          const json = await res.json();
+          if (!res.ok) throw new Error(json.error || "Something went wrong");
+
+          alert(data.previousProduct ? "Product updated!" : "Product created!");
+
+          await fetchData(); 
+           reset({
+            previousProduct: null,
+            nameEng: "",
+            nameUrd: "",
+            packing: "",
+            unit: null,
+            reorder: "",
+            saleMc: "",
+            pPrice: "",
+            sPrice: "",
+            type: null,
+            company: null,
+          });
+        } catch (err) {
+          console.error("Save failed:", err);
+          alert(err.message);
+        }
+      };
+
 
   const addOption = async (type) => {
   if (!newOptionName.trim()) return;
@@ -88,7 +137,6 @@ export default function MaterialForm() {
     const json = await res.json();
     if (!res.ok) throw new Error(json.error || "Failed to add");
 
-    // 🔄 Instead of manual setUnits/setCompanies...
     await fetchData();
   } catch (err) {
     console.error("Add option failed:", err);
@@ -117,31 +165,79 @@ export default function MaterialForm() {
        
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <p className="font-semibold">Product ID (auto)</p>
-            <input
-              readOnly
-              value={nextProductId || ""}
-              className="h-[50px] border-2 border-[#F3F6F8] rounded-lg p-3 w-full bg-gray-100"
-            />
-          </div>
+              <p className="font-semibold">Product ID (auto)</p>
+              <input
+                readOnly
+                value={
+                  watch("previousProduct") 
+                    ? watch("previousProduct").value 
+                    : nextProductId || ""             
+                }
+                className="h-[50px] border-2 border-[#F3F6F8] rounded-lg p-3 w-full bg-gray-100"
+              />
+            </div>
           <div>
-            <p  className="font-semibold">Previous Products</p>
-            <Controller
-              control={control}
-              name="previousProduct"
-              render={({ field }) => (
-                <Select
-                  {...field}
-                  options={products.map((p) => ({
-                    value: p.id,
-                    label: p.name_eng,
-                  }))}
-                  placeholder="Search product..."
-                  isSearchable
-                />
-              )}
-            />
-          </div>
+              <p className="font-semibold">Previous Products</p>
+              <Controller
+                control={control}
+                name="previousProduct"
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    options={products.map((p) => ({
+                      value: p.product_id,
+                      label: p.product_name_eng,
+                    }))}
+                    placeholder="Search product..."
+                    isSearchable
+                    onChange={(opt) => {
+                      field.onChange(opt);
+                      if (opt) {
+                        // fetch full product info
+                        fetch(`/api/materials/${opt.value}`)
+                          .then((res) => res.json())
+                          .then((product) => {
+                            if (product) {
+                             reset({
+                                  previousProduct: opt,
+                                  nameEng: product.product_name_eng,
+                                  nameUrd: product.product_name_urd || "",
+                                  packing: product.packing_no,
+                                  unit: units.find((u) => u.unit_id === product.unit_id)
+                                    ? {
+                                        value: product.unit_id,
+                                        label: units.find((u) => u.unit_id === product.unit_id).unit_name,
+                                      }
+                                    : null,
+                                  reorder: product.reorder_level,
+                                  saleMc: product.sales_mc,
+                                  pPrice: product.purchase_price,
+                                  sPrice: product.sale_price,
+                                  type: types.find((t) => t.type_id === product.type_id)
+                                    ? {
+                                        value: product.type_id,
+                                        label: types.find((t) => t.type_id === product.type_id).type_name,
+                                      }
+                                    : null,
+                                  company: companies.find((c) => c.company_id === product.company_id)
+                                    ? {
+                                        value: product.company_id,
+                                        label: companies.find((c) => c.company_id === product.company_id).company_name,
+                                      }
+                                    : null,
+                                });
+
+                            }
+                          });
+
+                      } else {
+                        reset(); // clear if unselected
+                      }
+                    }}
+                  />
+                )}
+              />
+            </div>
         </div>
 
         <div>
@@ -281,15 +377,15 @@ export default function MaterialForm() {
                    styles={{
                       container: (provided) => ({
                         ...provided,
-                        width: "200px",
+                        width: "400px",
                       }),
                       control: (provided) => ({
                         ...provided,
-                        minWidth: "150px", 
+                        minWidth: "250px", 
                       }),
                       menu: (provided) => ({
                         ...provided,
-                        width: "200px", 
+                        width: "400px", 
                       }),
                     }}
                 />
@@ -300,7 +396,7 @@ export default function MaterialForm() {
               onClick={() => setModalOpen("type")}
              className="p-3 flex justify-around align-middle border h-[50px] w-[100px] rounded-xl cursor-pointer hover:shadow-lg bg-[#141413] border-none text-white ml-2'"
               > <Image height={30} width={25} src={AddBlue} alt='Add-icon'/>
-              + Add
+              Add
             </button>
           </div>
           {errors.type && (
@@ -326,15 +422,15 @@ export default function MaterialForm() {
                    styles={{
                       container: (provided) => ({
                         ...provided,
-                        width: "200px",
+                        width: "400px",
                       }),
                       control: (provided) => ({
                         ...provided,
-                        minWidth: "150px", 
+                        minWidth: "250px", 
                       }),
                       menu: (provided) => ({
                         ...provided,
-                        width: "200px", 
+                        width: "400px", 
                       }),
                     }}
                 />
@@ -345,7 +441,7 @@ export default function MaterialForm() {
               onClick={() => setModalOpen("company")}
               className="p-3 flex justify-around align-middle border h-[50px] w-[100px] rounded-xl cursor-pointer hover:shadow-lg bg-[#141413] border-none text-white ml-2'"
               > <Image height={30} width={25} src={AddBlue} alt='Add-icon'/>
-              + Add
+              Add
             </button>
           </div>
           {errors.company && (
@@ -355,16 +451,17 @@ export default function MaterialForm() {
         <div className="flex justify-end">
           <button
             type="submit"
-            className="p-3 ml-2 h-[50px] w-[180px] rounded-xl bg-[#5145E7] text-white"
+            className="p-3 flex justify-center align-middle border h-[50px] rounded-xl cursor-pointer hover:shadow-lg bg-[#5145E7] border-none text-white ml-2 w-[150px]"
+            disabled={isSubmitting}
           >
-            Save Product
+            { isSubmitting ? <Spinner /> : watch("previousProduct") ? "Update Product" : "Add Product"}
           </button>
         </div>
       </form>
      </div>
     
       {modalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40">
+        <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm bg-opacity-40">
           <div className="bg-white p-6 rounded-lg shadow-md w-96">
             <h3 className="text-lg font-semibold mb-4">
               Add New {modalOpen === "unit"

@@ -81,7 +81,7 @@ export default function SubArea(){
                 <p className="text-3xl font-bold">Add New Subarea</p></div>
       <div className='flex flex-col gap-6 p-8 w-5xl  bg-white mt-[30px] rounded-lg shadow-md'>
          <div className='w-full'>
-           <p>Parent Area ID</p>
+           <p className=" font-semibold">Parent Area ID</p>
             <Select 
             options = {combo_options_id}
              value={combo_options_id.find((o) => o.value === selectedArea)}
@@ -95,7 +95,7 @@ export default function SubArea(){
                   }),
                 }}
              />
-            <p>Parent Area Name</p>
+            <p className=" font-semibold">Parent Area Name</p>
             <Select 
             options = {combo_options}
              value={combo_options.find((o) => o.value === selectedArea)}
@@ -111,7 +111,7 @@ export default function SubArea(){
              />
          </div>
        <div>
-        <p>Sub-area</p>
+        <p className=" font-semibold">Sub-area</p>
         <input className="h-[50px] border-2 border-solid border-[#F3F6F8] rounded-lg p-3 w-full"
             type="text"
             placeholder="Subarea Name"

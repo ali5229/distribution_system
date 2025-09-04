@@ -75,10 +75,10 @@ export default function UpdateSubarea() {
     <main className="m-10 flex flex-col">
        <div className='flex flex-row'>
              <BackButton />
-            <p className="text-3xl font-bold">Update a Sub-Area</p></div>
+            <p className="text-3xl font-bold ">Update a Sub-Area</p></div>
       <div className="flex flex-col gap-6 p-8 bg-white mt-6 rounded-lg shadow-md">
         <div>
-          <p>Area</p>
+          <p className=" font-semibold">Area</p>
           <Select
             options={areaOptions}
             value={areaOptions.find((o) => o.value === selectedArea)}
@@ -93,7 +93,7 @@ export default function UpdateSubarea() {
 
         {selectedArea && (
           <div>
-            <p>Sub-area</p>
+            <p className=" font-semibold">Sub-area</p>
             <Select
               options={subareaOptions}
               value={subareaOptions.find((o) => o.value === selectedSubarea)}
@@ -105,7 +105,7 @@ export default function UpdateSubarea() {
         )}
 
         <div>
-          <p>Enter New Sub-area Name</p>
+          <p className=" font-semibold">Enter New Sub-area Name</p>
           <input
             className="h-[50px] border-2 border-[#F3F6F8] rounded-lg p-3 w-full"
             type="text"

@@ -83,7 +83,7 @@ export default function SubArea(){
             <p className="text-3xl font-bold">Update an Area name</p></div>
       <div className='flex flex-col gap-6 p-8 w-5xl  bg-white mt-[30px] rounded-lg shadow-md'>
          <div className='w-full'>
-           <p>Area ID</p>
+           <p className=" font-semibold">Area ID</p>
             <Select 
             options = {combo_options_id}
              value={combo_options_id.find((o) => o.value === selectedArea)}
@@ -97,7 +97,7 @@ export default function SubArea(){
                   }),
                 }}
              />
-            <p>Area Name</p>
+            <p className=" font-semibold">Area Name</p>
             <Select 
             options = {combo_options}
              value={combo_options.find((o) => o.value === selectedArea)}
@@ -113,7 +113,7 @@ export default function SubArea(){
              />
          </div>
        <div>
-        <p>Enter the new Area name</p>
+        <p className=" font-semibold">Enter the new Area name</p>
         <input className="h-[50px] border-2 border-solid border-[#F3F6F8] rounded-lg p-3 w-full"
             type="text"
             placeholder="Area Name"

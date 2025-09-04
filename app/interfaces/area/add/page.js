@@ -69,7 +69,7 @@ export default function Area(){
       <div className='flex flex-col gap-6 p-8 w-5xl h-80 bg-white mt-[30px] rounded-lg shadow-md relative'>
          <div className='w-full'>
             <p className='font-bold p-3 flex justify-center align-middle border h-[50px] hover:shadow-lg bg-[#5145E7] border-none text-white ml-2 w-[100px]'>ID = {loadingId ? <Spinner/> : areaId}</p>
-            <p className='mt-[20px]'>Area Name</p>
+            <p className='mt-[20px] font-semibold'>Area Name</p>
             <input className='h-[50px] border-2 border-solid border-[#F3F6F8] rounded-lg p-3 w-full'
                    type="text" 
                    placeholder='e.g. North Region'
