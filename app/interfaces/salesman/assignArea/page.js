@@ -4,6 +4,8 @@ import LoadingIndicator from "../../../components/loadingIndicator/loadingIndica
 import Spinner from '../../../components/Spinner/loadSpinner'
 import BackButton from "@/app/components/backButton/backButton";
 import Select from "react-select";
+import Image from 'next/image'
+import DeleteIcon from '@/app/assets/salesman/delete.png'
 
 export default function AssignAreaPage() {
   const [loading, setLoading] = useState(false);
@@ -46,12 +48,12 @@ export default function AssignAreaPage() {
     label: s.salesman_name,
   }));
 
-  // Add area to salesman
+  
   const handleAssignArea = (areaId) => {
     if (!selectedSalesman) return;
     setAssignedAreas((prev) => {
       const current = prev[selectedSalesman] || [];
-      if (current.includes(areaId)) return prev; // avoid duplicates
+      if (current.includes(areaId)) return prev; 
       return {
         ...prev,
         [selectedSalesman]: [...current, areaId],
@@ -59,7 +61,7 @@ export default function AssignAreaPage() {
     });
   };
 
-  // Remove area from salesman
+ 
   const handleRemoveArea = (areaId) => {
     setAssignedAreas((prev) => {
       const current = prev[selectedSalesman] || [];
@@ -79,7 +81,7 @@ export default function AssignAreaPage() {
     const data = await res.json();
     setAssignedAreas((prev) => ({
       ...prev,
-      [salesmanId]: data.areas.map((a) => a.area_id), // ✅ use area_id
+      [salesmanId]: data.areas.map((a) => a.area_id),
     }));
   } catch (err) {
     console.error(err);
@@ -89,7 +91,7 @@ export default function AssignAreaPage() {
   }
 };
 
-  // Save assignments to backend
+  
  const handleSave = async () => {
   if (!selectedSalesman) return;
   setSaving(true);
@@ -98,7 +100,7 @@ export default function AssignAreaPage() {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        areaIds: assignedAreas[selectedSalesman] || [], // must be array of IDs
+        areaIds: assignedAreas[selectedSalesman] || [], 
       }),
     });
     if (!res.ok) throw new Error("Failed to save");
@@ -111,12 +113,12 @@ export default function AssignAreaPage() {
   }
 };
 
-  // Get list of assigned areas for current salesman
+  
   const currentAreas = (assignedAreas[selectedSalesman] || []).map((id) =>
     areas.find((a) => a.area_id === id)
   );
 
-  // Filter with search term
+ 
   const filteredAreas = currentAreas.filter((a) =>
     a?.area_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -144,7 +146,7 @@ export default function AssignAreaPage() {
                 value={salesmanOptions.find((o) => o.value === selectedSalesman)}
                 onChange={(opt) => {
                   setSelectedSalesman(opt.value);
-                  fetchAssignedAreas(opt.value); // fetch existing areas
+                  fetchAssignedAreas(opt.value); 
                 }}
                 placeholder="Select Salesman.."
                 isSearchable
@@ -165,43 +167,44 @@ export default function AssignAreaPage() {
             </div>
           </div>
 
-          {/* Assigned areas list */}
+          
           {selectedSalesman && (
             <div className="mt-6">
               <h2 className="font-bold mb-2">Assigned Areas</h2>
               <input
                 type="text"
-                placeholder="Search..."
+                placeholder="Search areas..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="border rounded p-2 mb-4 w-full"
+                className="border rounded p-2 mb-4 w-full border-[#c5c0c0] text-[#a0a0a0] focus:border-[#c5c0c0] focus:outline-none focus:ring-0"
               />
-              <table className="w-full border">
+              <div className="h-44 overflow-y-auto mb-10">
+              <table className="w-full ">
                 <thead>
-                  <tr className="bg-gray-200">
-                    <th className="border p-2">ID</th>
-                    <th className="border p-2">Area Name</th>
-                    <th className="border p-2">Action</th>
+                  <tr className="bg-[#F9FAFC] text-[#858D95] shadow-sm sticky top-0">
+                    <th className="p-2">ID</th>
+                    <th className="p-2">Area Name</th>
+                    <th className="p-2">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredAreas.length === 0 ? (
-                    <tr>
-                      <td colSpan="3" className="text-center p-2">
+                    <tr className="border-4 border-indigo-200 border-b-indigo-500">
+                      <td colSpan="3" className="text-center p-2 text-[#858D95]">
                         No areas assigned
                       </td>
                     </tr>
                   ) : (
                     filteredAreas.map((a) => (
-                      <tr key={a.area_id}>
-                        <td className="border p-2">{a.area_id}</td>
-                        <td className="border p-2">{a.area_name}</td>
-                        <td className="border p-2">
+                      <tr key={a.area_id} className="border-1 border-white border-b-[#F4F4F4] h-15" >
+                        <td className="p-2 text-center">{a.area_id}</td>
+                        <td className="p-2 text-center">{a.area_name}</td>
+                        <td className="p-2 text-center">
                           <button
+                            className="cursor-pointer"
                             onClick={() => handleRemoveArea(a.area_id)}
-                            className="text-red-600 hover:underline"
                           >
-                            Delete
+                            <Image src={DeleteIcon} height={20} alt="delete"/>
                           </button>
                         </td>
                       </tr>
@@ -209,10 +212,13 @@ export default function AssignAreaPage() {
                   )}
                 </tbody>
               </table>
+              </div>
+              <div className="flex flex-row justify-end">
               <button className='p-3 flex justify-center align-middle border h-[50px] rounded-xl cursor-pointer hover:shadow-lg bg-[#5145E7] border-none text-white ml-2 w-[100px]'
                                   type='button'
                                   onClick={handleSave}
                                   disabled={saving} >{saving ? <Spinner/> : "Save"}</button>
+              </div>
             </div>
           )}
         </div>

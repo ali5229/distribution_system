@@ -25,7 +25,7 @@ export async function POST(req) {
     const result = await sql(
       `INSERT INTO materials 
       (product_name_eng, product_name_urd, packing_no, unit_id, reorder_level, sales_mc, purchase_price, sale_price, type_id, company_id, location) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [product_name_eng, product_name_urd || null, packing_no, unit_id, reorder_level, sales_mc, purchase_price, sale_price, type_id, company_id, location || null]
     );
 
