@@ -2,6 +2,7 @@
 import {useState, useEffect} from 'react'
 import BackButton from '@/app/components/backButton/backButton';
 import Spinner from '@/app/components/Spinner/loadSpinner';
+import {toast } from 'react-toastify'
 
 export default function Area(){
    const [areaName, setAreaName] = useState('');
@@ -44,8 +45,7 @@ export default function Area(){
       });
       const json = await res.json();
       if(!res.ok) throw new Error(json.error || "Something went wrong");
-       setMsg(
-        `Saved! Area ID ${json.areaId}`);
+       toast.success('Area Saved')
       setAreaName("");
       fetchNextId();
     } catch(e){

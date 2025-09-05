@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Select from "react-select";
 import BackButton from "@/app/components/backButton/backButton";
 import Spinner from '@/app/components/Spinner/loadSpinner';
+import {toast } from 'react-toastify'
 
 export default function UpdateSubarea() {
   const [areas, setAreas] = useState([]);
@@ -58,7 +59,7 @@ export default function UpdateSubarea() {
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Something went wrong");
 
-      setMsg("Subarea updated successfully!");
+      toast.success('Subarea updated successfully!')
       setSelectedSubarea("");
       setNewSubareaName("");
     } catch (err) {

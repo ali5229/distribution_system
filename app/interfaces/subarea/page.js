@@ -3,6 +3,8 @@ import { useEffect, useState } from "react"
 import Select from "react-select";
 import BackButton from "@/app/components/backButton/backButton";
 import Spinner from '@/app/components/Spinner/loadSpinner';
+import {toast } from 'react-toastify'
+
 
 export default function SubArea(){
   
@@ -20,10 +22,10 @@ export default function SubArea(){
         if (res.ok) {
           setAreas(json.data);
         } else {
-          setMsg(json.error || "Failed to load areas");
+          toast.error('Failed To fetch areas')
         }
       } catch (err) {
-        setMsg(err.message);
+        toast.error('err.message')
       }
     }
     fetchAreas();
@@ -62,7 +64,7 @@ export default function SubArea(){
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Something went wrong");
 
-      setMsg(`Saved! Subarea ID ${json.subareaId}`);
+      toast.success('Saved')
       setSubAreaName("");
       setSelectedArea("");
     } catch (e) {

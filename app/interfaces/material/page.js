@@ -7,6 +7,7 @@ import AddBlue from '../../assets/area/add-blue.png'
 import Spinner from "@/app/components/Spinner/loadSpinner";
 import BackButton from "@/app/components/backButton/backButton";
 import LoadingIndicator from "@/app/components/loadingIndicator/loadingIndicator";
+import {toast } from 'react-toastify'
 
 export default function MaterialForm() {
 
@@ -96,7 +97,7 @@ export default function MaterialForm() {
           const json = await res.json();
           if (!res.ok) throw new Error(json.error || "Something went wrong");
 
-          alert(data.previousProduct ? "Product updated!" : "Product created!");
+          data.previousProduct ? toast.success("Product updated!") : toast.success("Product created!");
 
           await fetchData(); 
            reset({

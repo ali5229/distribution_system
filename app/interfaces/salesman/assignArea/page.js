@@ -6,6 +6,7 @@ import BackButton from "@/app/components/backButton/backButton";
 import Select from "react-select";
 import Image from 'next/image'
 import DeleteIcon from '@/app/assets/salesman/delete.png'
+import {toast } from 'react-toastify'
 
 export default function AssignAreaPage() {
   const [loading, setLoading] = useState(false);
@@ -104,7 +105,7 @@ export default function AssignAreaPage() {
       }),
     });
     if (!res.ok) throw new Error("Failed to save");
-    alert("Areas assigned successfully!");
+    toast.success('Areas assigned')
   } catch (err) {
     console.error(err);
     alert("Error saving assignments.");

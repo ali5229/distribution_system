@@ -5,6 +5,7 @@ import { useForm, Controller } from 'react-hook-form'
 import Select from 'react-select'
 import Spinner from '@/app/components/Spinner/loadSpinner'
 import LoadingIndicator from '@/app/components/loadingIndicator/loadingIndicator'
+import {toast } from 'react-toastify'
 
 export default function SalesmanPage() {
   const {
@@ -92,7 +93,7 @@ export default function SalesmanPage() {
             return;
           }
 
-          setMsg(data.searchSalesman ? "Salesman updated!" : "Salesman added!");
+          data.searchSalesman ? toast.success("Salesman updated!") :  toast.success("Salesman added!");
 
           await fetchSalesman();
           reset({
