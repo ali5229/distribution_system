@@ -159,41 +159,20 @@ export default function SalesmanPage() {
                     onChange={(opt) => {
                       field.onChange(opt);
                       if (opt) {setLoading(true);
-                        fetch(`/api/materials/${opt.value}`)  
+                        fetch(`/api/salesman/addUpdateSalesman/${opt.value}`)  
                           .then((res) => res.json())
-                          .then((product) => {
-                            if (product) { 
+                          .then((salesman) => {
+                            if (salesman) { 
                              reset({
-                                  previousProduct: opt,
-                                  nameEng: product.product_name_eng,
-                                  nameUrd: product.product_name_urd || "",
-                                  packing: product.packing_no,
-                                  unit: units.find((u) => u.unit_id === product.unit_id)
-                                    ? {
-                                        value: product.unit_id,
-                                        label: units.find((u) => u.unit_id === product.unit_id).unit_name,
-                                      }
-                                    : null,
-                                  reorder: product.reorder_level,
-                                  saleMc: product.sales_mc,
-                                  pPrice: product.purchase_price,
-                                  sPrice: product.sale_price,
-                                  type: types.find((t) => t.type_id === product.type_id)
-                                    ? {
-                                        value: product.type_id,
-                                        label: types.find((t) => t.type_id === product.type_id).type_name,
-                                      }
-                                    : null,
-                                  company: companies.find((c) => c.company_id === product.company_id)
-                                    ? {
-                                        value: product.company_id,
-                                        label: companies.find((c) => c.company_id === product.company_id).company_name,
-                                      }
-                                    : null,
-                                  pLocation: product.location || "",
+                                  searchSalesman: opt,
+                                  salesmanName: salesman.salesman_name,
+                                  bloodGroup: bloodGroupOptions.find(bg => bg.value === salesman.salesman_bld_grp),
+                                  salesmanContact: salesman.salesman_contact,
+                                  salesmanEmgContact: salesman.salesman_emg_contact,
+                                  salesmanAddress: salesman.salesman_address,
+                                  salesmanReference: salesman.salesman_reference || "",
                                 });
-
-                            } setLoading(false);
+                            }  setLoading(false);
                           });
 
                       } else {
@@ -295,7 +274,7 @@ export default function SalesmanPage() {
         <div className="flex justify-end">
                   <button
                     type="submit"
-                    className="p-3 flex justify-center align-middle border h-[50px] rounded-xl cursor-pointer hover:shadow-lg bg-[#5145E7] border-none text-white ml-2 w-[150px]"
+                    className="p-3 flex justify-center align-middle border h-[50px] rounded-xl cursor-pointer hover:shadow-lg bg-[#5145E7] border-none text-white ml-2 w-[250px]"
                     disabled={isSubmitting}
                   >
                     { isSubmitting ? <Spinner /> : watch("searchSalesman") ? "Update Salesman" : "Add Salesman"}
